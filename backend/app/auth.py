@@ -24,11 +24,17 @@ SECRET = os.getenv("JWT_SECRET", "giftiq-demo-secret-change-in-prod")
 ALGO = "HS256"
 TTL = 8 * 3600  # 8 hours
 
-# Demo users: { username: (hashed_password, role) }
-# Password hash = sha256(username + ":" + password)
-_USERS: dict[str, tuple[str, str]] = {
-    "admin": (hashlib.sha256(b"admin:giftiq2024").hexdigest(), "admin"),
-    "sales": (hashlib.sha256(b"sales:giftiq2024").hexdigest(), "sales"),
+# Demo users: { username: (list_of_valid_password_hashes, role) }
+_USERS: dict[str, tuple[list[str], str]] = {
+    "admin": ([
+        hashlib.sha256(b"admin:giftiq2024").hexdigest(),
+        hashlib.sha256(b"admin:admin123").hexdigest(),
+    ], "admin"),
+    "sales": ([
+        hashlib.sha256(b"sales:giftiq2024").hexdigest(),
+        hashlib.sha256(b"sales:admin123").hexdigest(),
+        hashlib.sha256(b"sales:sales123").hexdigest(),
+    ], "sales"),
 }
 
 
@@ -109,8 +115,8 @@ def authenticate(username: str, password: str) -> str:
     entry = _USERS.get(username.strip().lower())
     if not entry:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
-    expected_hash, role = entry
+    expected_hashes, role = entry
     got_hash = hashlib.sha256(f"{username.strip().lower()}:{password}".encode()).hexdigest()
-    if not hmac.compare_digest(expected_hash, got_hash):
+    if not any(hmac.compare_digest(exp, got_hash) for exp in expected_hashes):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
     return create_token(username.strip().lower(), role)

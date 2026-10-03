@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3001}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-10}
+    volumes:
+      - giftiq-data:/data
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+        NEXT_PUBLIC_COMPANY_NAME: ${NEXT_PUBLIC_COMPANY_NAME:-VIP Gifts Article}
+    depends_on:
+      - backend
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+
+volumes:
+  giftiq-data:

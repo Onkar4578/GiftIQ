@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --line: #D9DDEA; --ink: #1B2559; }
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-paper font-sans text-ink antialiased; line-height: 1.55; }
+h1, h2, h3 { @apply font-display tracking-tight; }
+
+:focus-visible { outline: 3px solid #F0A202; outline-offset: 2px; border-radius: 4px; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60; }
+  .btn-primary { @apply btn bg-ink text-white hover:bg-[#121a40]; }
+  .btn-accent { @apply btn bg-marigold text-ink hover:bg-[#d89200]; }
+  .btn-quiet { @apply btn border border-line bg-white text-ink hover:bg-paper; }
+  .field { @apply w-full rounded-md border border-line bg-white px-3 py-2.5 text-[15px] text-ink placeholder:text-slate2/70; }
+}
+
+/* The quote slip: a scalloped paper edge top and bottom, the one memorable element in the UI. */
+.slip { position: relative; background: #fff; margin: 8px 0; padding: 1.75rem 1.5rem; box-shadow: 0 14px 28px -20px rgba(27,37,89,.5); }
+.slip::before, .slip::after { content: ""; position: absolute; left: 0; right: 0; height: 8px; background-size: 16px 8px; background-repeat: repeat-x; }
+.slip::before { top: -8px; background-image: radial-gradient(circle at 8px 0, transparent 5px, #fff 5.5px); }
+.slip::after { bottom: -8px; background-image: radial-gradient(circle at 8px 8px, transparent 5px, #fff 5.5px); }
+.tear { border-top: 2px dashed var(--line); }
+.ruled { background-image: repeating-linear-gradient(to bottom, transparent 0 31px, var(--line) 31px 32px); }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .slip { box-shadow: none; padding: 0; }
+  .slip::before, .slip::after { display: none; }
+}

@@ -39,6 +39,15 @@ def create_app() -> FastAPI:
     )
     app.include_router(router)
 
+    @app.get("/")
+    def root():
+        return {
+            "status": "online",
+            "service": "GiftIQ Backend API",
+            "docs": "/docs",
+            "health": "/api/health"
+        }
+
     @app.exception_handler(Exception)
     async def unhandled(_: Request, exc: Exception):
         log.exception("Unhandled error: %s", exc)
